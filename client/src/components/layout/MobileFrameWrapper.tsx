@@ -50,7 +50,7 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const path = location.pathname;
   const isCreatorRoute = path.startsWith('/creator');
   const isAdminRoute = path.startsWith('/admin');
-  const isSplashOrAuth = !user || path === '/login' || path === '/register' || path === '/welcome' || path === '/welcome/';
+  const isAuthPage = path === '/login' || path === '/register' || path === '/welcome' || path === '/welcome/';
   const isLightPage = path === '/explore' || path.startsWith('/profile') || path === '/subscriptions';
 
   // Choose bg based on route
@@ -72,12 +72,12 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
         </div>
 
         {/* Inner Content Area */}
-        <div className={`flex-1 overflow-y-auto no-scrollbar relative flex flex-col ${!hideNav && !isSplashOrAuth ? 'pb-14' : ''}`}>
+        <div className={`flex-1 overflow-y-auto no-scrollbar relative flex flex-col ${!hideNav && !isAuthPage ? 'pb-14' : ''}`}>
           {children}
         </div>
 
         {/* Fixed Bottom Navigation Bar (Instagram Style) */}
-        {!hideNav && !isSplashOrAuth && (
+        {!hideNav && !isAuthPage && (
           <div
             className={`absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
               isCreatorRoute || isAdminRoute
