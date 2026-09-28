@@ -76,10 +76,10 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
           {children}
         </div>
 
-        {/* Fixed Bottom Navigation Bar (Instagram Style) */}
+        {/* Fixed Bottom Navigation Bar (Instagram Style - Fixed on Mobile, Absolute in Frame on Desktop) */}
         {!hideNav && !isAuthPage && (
           <div
-            className={`absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
+            className={`fixed md:absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
               isCreatorRoute || isAdminRoute
                 ? 'bg-[#090a0f]/95 border-t border-white/10 text-slate-400'
                 : 'bg-black border-t border-white/10 text-white shadow-lg'
