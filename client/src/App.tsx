@@ -71,14 +71,16 @@ export const App: React.FC = () => {
   const { user, loading } = useAuth();
   const [showSplash, setShowSplash] = useState<boolean>(true);
 
+  if (showSplash) {
+    return (
+      <UserShell>
+        <SplashScreen onFinish={() => setShowSplash(false)} durationMs={2000} />
+      </UserShell>
+    );
+  }
+
   return (
     <div className="relative w-full h-full min-h-screen bg-[#07090e]">
-      {/* App Opening Splash Screen */}
-      {showSplash && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#090a0f] overflow-hidden">
-          <SplashScreen onFinish={() => setShowSplash(false)} durationMs={2000} />
-        </div>
-      )}
 
       <Routes>
         {/* Gateway Welcome Route: User Login vs Influencer Login */}
