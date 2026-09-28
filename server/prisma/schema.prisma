@@ -1,0 +1,388 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  username      String    @unique
+  mobile        String?
+  passwordHash  String
+  role          String    @default("USER") // GUEST, USER, CREATOR, ADMIN
+  status        String    @default("ACTIVE") // ACTIVE, BLOCKED, SUSPENDED
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  profile             UserProfile?
+  creatorProfile      CreatorProfile?
+  creatorApplications CreatorApplication[]
+  videos              Video[]
+  posts               Post[]
+  comments            Comment[]
+  likes               Like[]
+  saves               Save[]
+  following           Follow[]             @relation("UserFollowing")
+  followers           Follow[]             @relation("UserFollowers")
+  shares              Share[]
+  reports             Report[]             @relation("UserReports")
+  subscriptions       Subscription[]       @relation("UserSubscriptions")
+  payments            Payment[]
+  notifications       Notification[]       @relation("UserNotifications")
+  triggeredNotifs     Notification[]       @relation("ActorNotifications")
+  watchHistories      WatchHistory[]
+  adminLogs           AdminActionLog[]     @relation("AdminLogs")
+}
+
+model UserProfile {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName   String
+  bio        String?  @default("")
+  avatarUrl  String?  @default("")
+  bannerUrl  String?  @default("")
+  isVerified Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+}
+
+model CreatorProfile {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  handle              String   @unique
+  displayName         String
+  category            String   @default("Comedy")
+  bio                 String?  @default("")
+  avatarUrl           String?  @default("")
+  bannerUrl           String?  @default("")
+  socialLinksJson     String?  @default("{}") // {"instagram":"", "youtube":"", "twitter":""}
+  monetizationActive  Boolean  @default(true)
+  grossEarningsCents  Int      @default(0)
+  pendingPayoutCents  Int      @default(0)
+  paidPayoutCents     Int      @default(0)
+  subscriberCount     Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  earnings          CreatorEarning[]
+  payouts           CreatorPayout[]
+  fanSubscriptions  Subscription[]    @relation("CreatorFanSubscriptions")
+  plans             SubscriptionPlan[] @relation("CreatorPlans")
+}
+
+model CreatorApplication {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creatorName     String
+  category        String
+  bio             String
+  socialLinks     String?
+  idProofUrl      String?
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  rejectionReason String?
+  reviewedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?  @default("Smile")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  videos Video[]
+  posts  Post[]
+}
+
+model Hashtag {
+  id         String   @id @default(uuid())
+  tag        String   @unique
+  usageCount Int      @default(0)
+  isBlocked  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  videos VideoHashtag[]
+}
+
+model Video {
+  id              String   @id @default(uuid())
+  creatorId       String
+  creator         User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  type            String   @default("REEL") // REEL, SHORT, POST_VIDEO
+  title           String
+  description     String?  @default("")
+  videoUrl        String
+  thumbnailUrl    String?  @default("")
+  durationSeconds Int      @default(30)
+  aspectRatio     String   @default("9:16") // 9:16, 16:9, 1:1
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  visibility      String   @default("PUBLIC") // PUBLIC, SUBSCRIBERS_ONLY, PRIVATE
+  status          String   @default("PUBLISHED") // DRAFT, PENDING_APPROVAL, APPROVED, REJECTED, PUBLISHED, BLOCKED
+  rejectionReason String?
+  isFeatured      Boolean  @default(false)
+  viewsCount      Int      @default(0)
+  likesCount      Int      @default(0)
+  commentsCount   Int      @default(0)
+  sharesCount     Int      @default(0)
+  savesCount      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  hashtags       VideoHashtag[]
+  comments       Comment[]
+  likes          Like[]
+  saves          Save[]
+  shares         Share[]
+  reports        Report[]
+  watchHistories WatchHistory[]
+}
+
+model VideoHashtag {
+  videoId   String
+  video     Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  hashtagId String
+  hashtag   Hashtag @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, hashtagId])
+}
+
+model Post {
+  id            String    @id @default(uuid())
+  creatorId     String
+  creator       User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  caption       String
+  imageUrl      String?
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  status        String    @default("PUBLISHED") // DRAFT, PENDING_APPROVAL, PUBLISHED, BLOCKED
+  likesCount    Int       @default(0)
+  commentsCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  comments Comment[]
+  likes    Like[]
+  saves    Save[]
+  reports  Report[]
+}
+
+model Comment {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId    String?
+  video      Video?    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  postId     String?
+  post       Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId   String?
+  parent     Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    Comment[] @relation("CommentReplies")
+  content    String
+  likesCount Int       @default(0)
+  isFlagged  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  likes   Like[]
+  reports Report[]
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId   String?
+  video     Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, videoId])
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}
+
+model Save {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId   String?
+  video     Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, videoId])
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Share {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  platform  String   @default("DIRECT_LINK") // DIRECT_LINK, WHATSAPP, TWITTER, EMBED
+  createdAt DateTime @default(now())
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  reporterId  String
+  reporter    User     @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetType  String   // VIDEO, POST, COMMENT, USER
+  videoId     String?
+  video       Video?   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  postId      String?
+  post        Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId   String?
+  comment     Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  targetId    String
+  reason      String   // SPAM, HARASSMENT, INAPPROPRIATE, MISINFORMATION, COPYRIGHT
+  details     String?
+  status      String   @default("PENDING") // PENDING, RESOLVED, DISMISSED
+  actionTaken String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SubscriptionPlan {
+  id             String          @id @default(uuid())
+  type           String          @default("FAN_SUBSCRIPTION") // CREATOR_ACCESS, FAN_SUBSCRIPTION, PLATFORM_VIP
+  creatorId      String?
+  creator        CreatorProfile? @relation("CreatorPlans", fields: [creatorId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  priceCents     Int             @default(499) // e.g. 4.99 USD = 499
+  interval       String          @default("MONTHLY") // MONTHLY, YEARLY
+  perksJson      String          @default("[\"Ad-free Experience\", \"Exclusive Creator Badges\", \"Priority Comments\"]")
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id         String           @id @default(uuid())
+  userId     String
+  user       User             @relation("UserSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
+  planId     String
+  plan       SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  creatorId  String?
+  creator    CreatorProfile?  @relation("CreatorFanSubscriptions", fields: [creatorId], references: [id], onDelete: Cascade)
+  status     String           @default("ACTIVE") // ACTIVE, PENDING, EXPIRED, CANCELLED, FAILED
+  amountPaid Int              @default(499)
+  startsAt   DateTime         @default(now())
+  expiresAt  DateTime
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  payments Payment[]
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  amountCents    Int
+  currency       String        @default("USD")
+  type           String        @default("SUBSCRIPTION") // CREATOR_ACCESS, FAN_SUBSCRIPTION, TIP
+  provider       String        @default("MOCK_GATEWAY")
+  providerRef    String        @unique
+  status         String        @default("SUCCESS") // SUCCESS, PENDING, FAILED, REFUNDED
+  metadataJson   String?       @default("{}")
+  createdAt      DateTime      @default(now())
+}
+
+model CreatorEarning {
+  id                String         @id @default(uuid())
+  creatorId         String
+  creator           CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  sourceType        String         @default("SUBSCRIPTION") // SUBSCRIPTION, VIEWS_MONETIZATION, TIP
+  referenceId       String?
+  grossAmountCents  Int
+  platformFeeCents  Int
+  netAmountCents    Int
+  status            String         @default("AVAILABLE") // PENDING, AVAILABLE, PAID
+  createdAt         DateTime       @default(now())
+}
+
+model CreatorPayout {
+  id             String         @id @default(uuid())
+  creatorId      String
+  creator        CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  amountCents    Int
+  status         String         @default("PENDING") // PENDING, PROCESSING, PAID, FAILED, CANCELLED
+  payoutMethod   String         @default("BANK_TRANSFER") // BANK_TRANSFER, PAYPAL, STRIPE_CONNECT
+  accountDetails String?
+  transactionRef String?
+  processedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?    @relation("ActorNotifications", fields: [actorId], references: [id], onDelete: SetNull)
+  type       String   // FOLLOW, LIKE, COMMENT, REPLY, CREATOR_APPROVED, VIDEO_APPROVED, VIDEO_REJECTED, SUBSCRIBER, PAYOUT_PAID
+  title      String
+  message    String
+  entityType String?  // VIDEO, POST, USER, EARNING, APPLICATION
+  entityId   String?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model WatchHistory {
+  id                   String   @id @default(uuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId              String
+  video                Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  watchDurationSeconds Int      @default(0)
+  completed            Boolean  @default(false)
+  watchedAt            DateTime @default(now())
+
+  @@unique([userId, videoId])
+}
+
+model AdminActionLog {
+  id           String   @id @default(uuid())
+  adminId      String
+  admin        User     @relation("AdminLogs", fields: [adminId], references: [id], onDelete: Cascade)
+  action       String   // APPROVE_CREATOR, REJECT_CREATOR, BLOCK_USER, APPROVE_VIDEO, REJECT_VIDEO, BLOCK_VIDEO, PROCESS_PAYOUT
+  targetEntity String   // USER, CREATOR, VIDEO, PAYOUT, REPORT
+  targetId     String
+  details      String?
+  createdAt    DateTime @default(now())
+}
