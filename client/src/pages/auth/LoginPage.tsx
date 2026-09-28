@@ -86,9 +86,9 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-6 bg-[#090a0f] text-slate-100 select-none overflow-y-auto no-scrollbar animate-fade-in">
+    <div className="min-h-screen min-h-[100dvh] w-full flex flex-col justify-between px-6 py-6 pt-[env(safe-area-inset-top,24px)] pb-[env(safe-area-inset-bottom,32px)] bg-[#090a0f] text-slate-100 select-none overflow-y-auto no-scrollbar animate-fade-in">
       {/* Top Mini Brand Logo & Back Button */}
-      <div className="flex items-center justify-between pt-1">
+      <div className="flex items-center justify-between pt-1 max-w-md mx-auto w-full">
         <button
           onClick={() => navigate('/welcome')}
           className="p-1.5 rounded-full bg-[#151824] text-slate-400 hover:text-white border border-white/5 transition"
@@ -101,7 +101,7 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {/* Main Form Section */}
-      <div className="space-y-4 my-auto">
+      <div className="space-y-4 my-auto max-w-md mx-auto w-full py-4">
         <div className="text-center space-y-1">
           <h1 className="text-xl font-black text-white">
             {getPageTitle()}

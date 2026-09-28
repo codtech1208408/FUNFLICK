@@ -18,24 +18,26 @@ export const WelcomeGatewayPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col justify-between p-6 bg-[#090a0f] text-slate-100 relative overflow-hidden select-none animate-fade-in">
+    <div className="min-h-screen min-h-[100dvh] w-full flex flex-col justify-center items-center px-6 py-8 pt-[env(safe-area-inset-top,32px)] pb-[env(safe-area-inset-bottom,40px)] bg-[#090a0f] text-slate-100 relative overflow-y-auto no-scrollbar select-none animate-fade-in">
       {/* Background ambient lighting */}
-      <div className="absolute -top-10 -right-10 w-48 h-48 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 translate-x-1/2 translate-y-1/2 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Brand Hero */}
-      <div className="pt-4 flex flex-col items-center text-center space-y-3 z-10">
-        <FunFlickLogo size="lg" showWordmark={true} />
-        <p className="text-xs text-slate-400 max-w-[260px] leading-relaxed">
-          The ultimate social platform for comedy, vertical reels & creator monetization.
-        </p>
-      </div>
+      {/* Main Container */}
+      <div className="w-full max-w-md my-auto flex flex-col items-center space-y-8 z-10 py-4">
+        {/* Top Brand Hero */}
+        <div className="flex flex-col items-center text-center space-y-3 z-10">
+          <FunFlickLogo size="lg" showWordmark={true} />
+          <p className="text-xs text-slate-400 max-w-[280px] leading-relaxed">
+            The ultimate social platform for comedy, vertical reels & creator monetization.
+          </p>
+        </div>
 
-      {/* Center Action Gateway Cards */}
-      <div className="space-y-4 my-auto z-10">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center">
-          Choose How You Want to Enter
-        </p>
+        {/* Center Action Gateway Cards */}
+        <div className="w-full space-y-4 z-10">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center">
+            Choose How You Want to Enter
+          </p>
 
         {/* 1. User / Viewer Login Button */}
         <button
@@ -116,5 +118,6 @@ export const WelcomeGatewayPage: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
