@@ -50,7 +50,7 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const path = location.pathname;
   const isCreatorRoute = path.startsWith('/creator');
   const isAdminRoute = path.startsWith('/admin');
-  const isAuthPage = path === '/login' || path === '/register' || path === '/welcome' || path === '/welcome/';
+  const isAuthPage = !user || path === '/login' || path === '/register' || path === '/welcome' || path === '/welcome/';
   const isLightPage = path === '/explore' || path.startsWith('/profile') || path === '/subscriptions';
 
   // Choose bg based on route
