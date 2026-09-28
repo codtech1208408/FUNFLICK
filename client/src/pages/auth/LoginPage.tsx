@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Smartphone, Lock, Eye, EyeOff, Check, User, Video, ShieldCheck, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Smartphone, Lock, Eye, EyeOff, User, ArrowLeft, KeyRound, CheckCircle2, Sparkles } from 'lucide-react';
 import { FunFlickLogo } from '../../components/common/FunFlickLogo';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -12,9 +12,12 @@ export const LoginPage: React.FC = () => {
   const roleParam = searchParams.get('role');
 
   const [isSignUp, setIsSignUp] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'otp' | 'password'>('otp');
   const [countryCode, setCountryCode] = useState('+91');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('123456');
+  const [otpSent, setOtpSent] = useState(true);
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -29,29 +32,44 @@ export const LoginPage: React.FC = () => {
   };
 
   const getPageSubtitle = () => {
-    if (isSignUp) return 'Sign up to start watching, creating & sharing reels';
-    if (roleParam === 'CREATOR') return 'Enter your creator credentials to access Creator Studio';
+    if (isSignUp) return 'Sign up to start watching comedy reels & supporting creators';
+    if (roleParam === 'CREATOR') return 'Login to access your Influencer & Creator Studio';
     if (roleParam === 'ADMIN') return 'Enter administrator credentials to access Admin Panel';
-    return 'Enter your mobile/email & password to continue';
+    return 'Login via instant temporary OTP or password';
+  };
+
+  const handleSendOtp = () => {
+    if (!identifier.trim()) {
+      setError('Please enter your mobile number first.');
+      return;
+    }
+    setError('');
+    setOtp('123456');
+    setOtpSent(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!identifier.trim() || !password.trim()) {
-      setError('Please fill in both identifier and password.');
+    if (!identifier.trim()) {
+      setError('Please enter your mobile number or email.');
       return;
     }
 
     try {
       setLoading(true);
       if (isSignUp) {
-        const username = identifier.includes('@') ? identifier.split('@')[0] : identifier;
+        if (!password.trim()) {
+          setError('Please create a password for your account.');
+          setLoading(false);
+          return;
+        }
+        const username = identifier.includes('@') ? identifier.split('@')[0] : identifier.replace(/\D/g, '') || 'user';
         const res = await api.post('/auth/register', {
           fullName: fullName || username,
-          username,
-          email: identifier.includes('@') ? identifier : `${identifier}@funflick.com`,
+          username: `user_${username.slice(-6)}`,
+          email: identifier.includes('@') ? identifier : `${countryCode}${identifier.replace(/\D/g, '')}@funflick.com`,
           mobile: identifier.includes('@') ? undefined : `${countryCode}${identifier.replace(/\D/g, '')}`,
           password
         });
@@ -65,7 +83,29 @@ export const LoginPage: React.FC = () => {
             navigate('/');
           }
         }
+      } else if (authMethod === 'otp') {
+        const fullMobile = identifier.includes('@') ? identifier : `${countryCode}${identifier.replace(/\D/g, '')}`;
+        const res = await api.post('/auth/login-otp', {
+          identifier: fullMobile || identifier,
+          otp: otp || '123456',
+          role: roleParam
+        });
+        if (res.data.success) {
+          login(res.data.token, res.data.user);
+          if (res.data.user.role === 'CREATOR' || roleParam === 'CREATOR') {
+            navigate('/creator/dashboard');
+          } else if (res.data.user.role === 'ADMIN' || roleParam === 'ADMIN') {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/');
+          }
+        }
       } else {
+        if (!password.trim()) {
+          setError('Please enter your password.');
+          setLoading(false);
+          return;
+        }
         const res = await api.post('/auth/login', { identifier, password });
         if (res.data.success) {
           login(res.data.token, res.data.user);
@@ -79,16 +119,16 @@ export const LoginPage: React.FC = () => {
         }
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Authentication failed. Please verify your credentials.');
+      setError(err.response?.data?.message || 'Authentication failed. Please verify your details.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] w-full flex flex-col justify-between px-6 py-6 pt-[env(safe-area-inset-top,24px)] pb-[env(safe-area-inset-bottom,32px)] bg-[#090a0f] text-slate-100 select-none overflow-y-auto no-scrollbar animate-fade-in">
+    <div className="min-h-screen min-h-[100dvh] w-full flex flex-col items-center justify-between px-5 py-6 pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,60px)] bg-[#090a0f] text-slate-100 select-none overflow-y-auto no-scrollbar animate-fade-in">
       {/* Top Mini Brand Logo & Back Button */}
-      <div className="flex items-center justify-between pt-1 max-w-md mx-auto w-full">
+      <div className="flex items-center justify-between pt-1 max-w-md mx-auto w-full flex-shrink-0">
         <button
           onClick={() => navigate('/welcome')}
           className="p-1.5 rounded-full bg-[#151824] text-slate-400 hover:text-white border border-white/5 transition"
@@ -101,7 +141,7 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {/* Main Form Section */}
-      <div className="space-y-4 my-auto max-w-md mx-auto w-full py-4">
+      <div className="space-y-4 my-auto max-w-md mx-auto w-full py-6 pb-12 flex-1 flex flex-col justify-center">
         <div className="text-center space-y-1">
           <h1 className="text-xl font-black text-white">
             {getPageTitle()}
@@ -111,9 +151,54 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
+        {!isSignUp && (
+          <div className="flex items-center bg-[#151824] p-1 rounded-2xl border border-white/10 text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => setAuthMethod('otp')}
+              className={`flex-1 py-2 rounded-xl transition flex items-center justify-center gap-1.5 ${
+                authMethod === 'otp'
+                  ? 'bg-rose-500 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>OTP Login</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMethod('password')}
+              className={`flex-1 py-2 rounded-xl transition flex items-center justify-center gap-1.5 ${
+                authMethod === 'password'
+                  ? 'bg-rose-500 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Password Login</span>
+            </button>
+          </div>
+        )}
+
         {error && (
           <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-2xl text-xs text-center">
             {error}
+          </div>
+        )}
+
+        {authMethod === 'otp' && !isSignUp && (
+          <div className="p-2.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-2xl text-[11px] flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>Temporary OTP: <strong className="text-white font-mono text-xs bg-amber-400/20 px-1.5 py-0.5 rounded">123456</strong></span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              className="text-[10px] font-bold bg-amber-500 text-slate-950 px-2 py-1 rounded-lg hover:bg-amber-400 transition flex-shrink-0"
+            >
+              Auto-Fill
+            </button>
           </div>
         )}
 
@@ -160,32 +245,57 @@ export const LoginPage: React.FC = () => {
                 required
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="Mobile Number / Email"
+                placeholder={authMethod === 'otp' ? 'Mobile Number' : 'Mobile Number / Email'}
                 className="w-full bg-transparent text-xs text-white placeholder-slate-400 py-3 outline-none"
               />
             </div>
           </div>
 
-          <div>
-            <div className="relative flex items-center bg-[#151824] rounded-2xl border border-white/10 px-3.5 focus-within:border-rose-500">
-              <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full bg-transparent text-xs text-white placeholder-slate-400 py-3 outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-slate-400 hover:text-white p-1"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+          {/* OTP Input for OTP Mode */}
+          {authMethod === 'otp' && !isSignUp ? (
+            <div>
+              <div className="relative flex items-center bg-[#151824] rounded-2xl border border-white/10 px-3.5 focus-within:border-rose-500">
+                <KeyRound className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
+                <input
+                  type="text"
+                  required
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Enter 6-Digit OTP (Default: 123456)"
+                  className="w-full bg-transparent text-xs text-white placeholder-slate-400 py-3 outline-none tracking-widest font-mono font-bold"
+                />
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  className="text-[10px] font-bold text-rose-400 hover:text-rose-300 flex-shrink-0 ml-1"
+                >
+                  Resend OTP
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>
+              <div className="relative flex items-center bg-[#151824] rounded-2xl border border-white/10 px-3.5 focus-within:border-rose-500">
+                <Lock className="w-4 h-4 text-slate-400 mr-2 flex-shrink-0" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full bg-transparent text-xs text-white placeholder-slate-400 py-3 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-slate-400 hover:text-white p-1"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Remember me & Forgot Password */}
           <div className="flex items-center justify-between text-[11px] pt-1 px-1">
@@ -199,43 +309,45 @@ export const LoginPage: React.FC = () => {
               <span>Remember me</span>
             </label>
 
-            <button
-              type="button"
-              onClick={() => alert('Password reset instructions sent to your email/mobile.')}
-              className="text-purple-400 hover:text-purple-300 font-semibold"
-            >
-              Forgot Password?
-            </button>
+            {authMethod === 'password' && (
+              <button
+                type="button"
+                onClick={() => alert('Password reset instructions sent to your email/mobile.')}
+                className="text-purple-400 hover:text-purple-300 font-semibold"
+              >
+                Forgot Password?
+              </button>
+            )}
           </div>
 
-          {/* Login Gradient Button */}
+          {/* Login / SignUp Gradient Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-full bg-gradient-to-r from-rose-500 via-rose-600 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-bold text-xs shadow-xl shadow-rose-500/25 transition-all active:scale-95 flex items-center justify-center tracking-wider uppercase mt-2"
+            className="w-full py-3.5 rounded-full bg-gradient-to-r from-rose-500 via-rose-600 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-bold text-xs shadow-xl shadow-rose-500/25 transition-all active:scale-95 flex items-center justify-center tracking-wider uppercase mt-3"
           >
-            {loading ? 'Authenticating...' : (isSignUp ? 'Sign Up' : 'Login')}
+            {loading ? 'Authenticating...' : (isSignUp ? 'Sign Up' : (authMethod === 'otp' ? 'Verify & Login (OTP 123456)' : 'Login'))}
           </button>
         </form>
-      </div>
 
-      {/* Bottom Switch: Sign Up / Login */}
-      <div className="text-center text-xs text-slate-400 pt-3">
-        {isSignUp ? (
-          <span>
-            Already have an account?{' '}
-            <button onClick={() => setIsSignUp(false)} className="text-rose-400 font-bold hover:underline">
-              Login
-            </button>
-          </span>
-        ) : (
-          <span>
-            Don't have an account?{' '}
-            <button onClick={() => setIsSignUp(true)} className="text-sky-400 font-bold hover:underline">
-              Sign Up
-            </button>
-          </span>
-        )}
+        {/* Bottom Switch: Sign Up / Login (Positioned inside main flow so it never gets cut off) */}
+        <div className="text-center text-xs text-slate-400 pt-4 pb-4">
+          {isSignUp ? (
+            <span>
+              Already have an account?{' '}
+              <button onClick={() => setIsSignUp(false)} className="text-rose-400 font-bold hover:underline py-1 px-2">
+                Login
+              </button>
+            </span>
+          ) : (
+            <span>
+              Don't have an account?{' '}
+              <button onClick={() => setIsSignUp(true)} className="text-sky-400 font-bold hover:underline py-1 px-2">
+                Sign Up
+              </button>
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

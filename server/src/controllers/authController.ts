@@ -340,3 +340,88 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     return res.status(500).json({ success: false, message: 'Failed to request password reset' });
   }
 };
+
+export const loginWithOtp = async (req: Request, res: Response) => {
+  try {
+    const { identifier, otp, role } = req.body;
+
+    if (!identifier || !otp) {
+      return res.status(400).json({ success: false, message: 'Please provide mobile number and OTP' });
+    }
+
+    if (otp !== '123456' && otp.length < 4) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP. Please use temporary OTP: 123456' });
+    }
+
+    const cleanIdentifier = identifier.trim().toLowerCase();
+    const digitsOnly = cleanIdentifier.replace(/\D/g, '');
+
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: cleanIdentifier },
+          { username: cleanIdentifier },
+          { mobile: cleanIdentifier },
+          ...(digitsOnly.length >= 7 ? [{ mobile: { contains: digitsOnly } }] : [])
+        ]
+      },
+      include: {
+        profile: true,
+        creatorProfile: true
+      }
+    });
+
+    if (!user) {
+      // Auto-register user with default temporary credentials
+      const generatedUsername = `user_${digitsOnly.slice(-6) || Math.floor(100000 + Math.random() * 900000)}`;
+      const passwordHash = await bcrypt.hash('password123', 10);
+      user = await prisma.user.create({
+        data: {
+          username: generatedUsername,
+          email: `${generatedUsername}@funflick.com`,
+          mobile: cleanIdentifier,
+          passwordHash,
+          role: role === 'CREATOR' ? 'CREATOR' : 'USER',
+          status: 'ACTIVE',
+          profile: {
+            create: {
+              fullName: generatedUsername,
+              avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${generatedUsername}`,
+              bio: 'Hey there! I am having fun on FunFlick 🎉'
+            }
+          }
+        },
+        include: {
+          profile: true,
+          creatorProfile: true
+        }
+      });
+    }
+
+    const token = signToken({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      status: user.status
+    });
+
+    return res.json({
+      success: true,
+      message: 'OTP Login successful',
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        mobile: user.mobile,
+        role: user.role,
+        profile: user.profile,
+        creatorProfile: user.creatorProfile
+      }
+    });
+  } catch (error: any) {
+    console.error('OTP login error:', error);
+    return res.status(500).json({ success: false, message: 'OTP Login failed', error: error.message });
+  }
+};
