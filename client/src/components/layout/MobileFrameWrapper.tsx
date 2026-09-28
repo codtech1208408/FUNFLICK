@@ -60,16 +60,16 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const homeBarColor = isLightPage && !isCreatorRoute && !isAdminRoute ? 'bg-slate-300' : 'bg-white/30';
 
   return (
-    <div className={`min-h-screen w-full ${frameBg} flex flex-col relative select-none transition-colors duration-200`}>
+    <div className={`h-full w-full ${frameBg} flex flex-col relative select-none overflow-hidden transition-colors duration-200`}>
       {/* Inner Content Area */}
-      <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
+      <div className={`flex-1 overflow-y-auto no-scrollbar relative flex flex-col ${!hideNav && !isSplashOrAuth ? 'pb-14' : ''}`}>
         {children}
       </div>
 
-      {/* Docked Bottom Navigation Bar (Instagram Style) */}
+      {/* Fixed Bottom Navigation Bar (Instagram Style) */}
       {!hideNav && !isSplashOrAuth && (
         <div
-          className={`h-14 px-2 flex items-center justify-around flex-shrink-0 z-30 ${
+          className={`fixed bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
             isCreatorRoute || isAdminRoute
               ? 'bg-[#090a0f]/95 border-t border-white/10 text-slate-400'
               : 'bg-black border-t border-white/10 text-white shadow-lg'

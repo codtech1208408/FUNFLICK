@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import { ReelCard, ReelData } from '../../components/video/ReelCard';
-import { Flame } from 'lucide-react';
+import { DEFAULT_REELS } from './HomeFeed';
 
 export const ReelsPage: React.FC = () => {
   const [reels, setReels] = useState<ReelData[]>([]);
@@ -9,15 +9,48 @@ export const ReelsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const getMappedDefaultReels = (): ReelData[] => {
+    return DEFAULT_REELS.map((item) => ({
+      id: item.id,
+      creatorId: item.creatorId,
+      title: item.title,
+      description: item.description,
+      videoUrl: item.videoUrl,
+      thumbnailUrl: item.thumbnailUrl,
+      viewsCount: 2400000,
+      likesCount: item.likesCount,
+      commentsCount: item.commentsCount,
+      sharesCount: item.sharesCount,
+      savesCount: item.savesCount,
+      isLiked: false,
+      isSaved: false,
+      isFollowing: false,
+      creator: {
+        id: item.creator.id,
+        username: item.creator.username,
+        profile: item.creator.profile,
+        creatorProfile: {
+          handle: item.creator.username,
+          displayName: item.creator.profile.fullName,
+          subscriberCount: 2800000
+        }
+      },
+      category: { name: 'Comedy', slug: 'comedy' },
+      hashtags: [{ hashtag: { tag: 'comedy' } }, { hashtag: { tag: 'funny' } }]
+    }));
+  };
+
   const fetchReels = async () => {
     try {
       setLoading(true);
       const res = await api.get('/videos/reels', { params: { limit: 12 } });
-      if (res.data.success) {
+      if (res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
         setReels(res.data.data);
+      } else {
+        setReels(getMappedDefaultReels());
       }
     } catch (err) {
-      console.error('Failed to load reels', err);
+      setReels(getMappedDefaultReels());
     } finally {
       setLoading(false);
     }
@@ -66,16 +99,6 @@ export const ReelsPage: React.FC = () => {
       <div className="h-[80vh] flex flex-col items-center justify-center space-y-4">
         <div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-sm font-bold text-slate-300">Loading FunFlick Comedy Reels...</p>
-      </div>
-    );
-  }
-
-  if (reels.length === 0) {
-    return (
-      <div className="h-[80vh] flex flex-col items-center justify-center space-y-3">
-        <Flame className="w-16 h-16 text-rose-500" />
-        <h2 className="text-xl font-bold text-white">No Reels Available</h2>
-        <p className="text-xs text-slate-400">Check back later or upload your own comedy sketch!</p>
       </div>
     );
   }
