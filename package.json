@@ -2,16 +2,23 @@
   "name": "funflick-platform",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "description": "FunFlick - Social Entertainment & Short Video Platform",
   "scripts": {
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
-    "build": "cd server && npm run build && cd ../client && npm run build",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "cd client && npm run build",
+    "build:all": "cd server && npm run build && cd ../client && npm run build",
     "seed": "cd server && npm run seed"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "typescript": "^5.6.2"
   }
 }
