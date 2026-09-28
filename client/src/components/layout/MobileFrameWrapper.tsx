@@ -77,10 +77,10 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
           {children}
         </div>
 
-        {/* Fixed Bottom Navigation Bar (Instagram Style - ONLY AFTER LOGIN) */}
+        {/* Fixed Bottom Navigation Bar (Fixed on Mobile Viewport, Absolute in Frame on Desktop) */}
         {shouldShowBottomNav && (
           <div
-            className={`absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
+            className={`fixed md:absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
               isCreatorRoute || isAdminRoute
                 ? 'bg-[#090a0f]/98 border-t border-white/10 text-slate-400'
                 : 'bg-black border-t border-white/10 text-white shadow-2xl'

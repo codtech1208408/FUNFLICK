@@ -34,7 +34,7 @@ export const StudioEarnings: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full bg-[#090a0f] text-white flex flex-col p-4 space-y-4 select-none overflow-y-auto no-scrollbar">
+    <div className="w-full h-full bg-[#090a0f] text-white flex flex-col p-4 pb-20 space-y-4 select-none overflow-y-auto no-scrollbar">
       {/* Top Bar (Screen 11: < Earnings and Withdraw button) */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

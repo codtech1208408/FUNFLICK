@@ -9,7 +9,7 @@ export const StudioDashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState('Last 30 Days');
 
   return (
-    <div className="w-full h-full bg-[#090a0f] text-white flex flex-col p-4 space-y-4 select-none overflow-y-auto no-scrollbar">
+    <div className="w-full h-full bg-[#090a0f] text-white flex flex-col p-4 pb-20 space-y-4 select-none overflow-y-auto no-scrollbar">
       {/* Top Bar (Screen 9) */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
