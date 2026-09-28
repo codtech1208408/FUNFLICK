@@ -60,53 +60,21 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const homeBarColor = isLightPage && !isCreatorRoute && !isAdminRoute ? 'bg-slate-300' : 'bg-white/30';
 
   return (
-    <div className="min-h-screen w-full bg-[#07090e] text-slate-100 flex items-center justify-center p-0 sm:p-4 relative overflow-hidden select-none">
-      {/* Ambient background glows */}
-      <div className="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/3 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+    <div className={`min-h-screen w-full ${frameBg} flex flex-col relative select-none transition-colors duration-200`}>
+      {/* Inner Content Area */}
+      <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
+        {children}
+      </div>
 
-      {/* Pure Smartphone Device Frame */}
-      <div
-        id="app-mobile-frame"
-        className={`relative w-full sm:max-w-[420px] h-screen sm:h-[860px] sm:max-h-[94vh] sm:rounded-[48px] sm:border-[10px] sm:border-[#1c2030] sm:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_50px_rgba(244,63,94,0.2)] sm:ring-1 sm:ring-white/20 ${frameBg} flex flex-col overflow-hidden transition-colors duration-200`}
-      >
-        {/* Smartphone Hardware Buttons Accents on sides */}
-        <div className="hidden sm:block absolute -left-[14px] top-28 w-[4px] h-10 bg-slate-700 rounded-l-md pointer-events-none" />
-        <div className="hidden sm:block absolute -left-[14px] top-44 w-[4px] h-12 bg-slate-700 rounded-l-md pointer-events-none" />
-        <div className="hidden sm:block absolute -right-[14px] top-32 w-[4px] h-14 bg-slate-700 rounded-r-md pointer-events-none" />
-
-        {/* Smartphone Status Bar & Dynamic Island */}
-        <div className={`h-10 px-6 pt-1 flex items-center justify-between z-40 ${statusBarColor} flex-shrink-0 relative`}>
-          <span className="text-[12px] font-bold tracking-tight">{currentTime}</span>
-
-          {/* Dynamic Island / Camera Pill */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-2 h-5 w-24 bg-black rounded-full border border-white/10 flex items-center justify-end px-2 gap-1.5 shadow-inner">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#0a1128] border border-[#1e293b]" />
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
-          </div>
-
-          {/* Status Icons */}
-          <div className={`flex items-center gap-1.5 ${statusIconColor}`}>
-            <Signal className="w-3.5 h-3.5" />
-            <Wifi className="w-3.5 h-3.5" />
-            <Battery className="w-4 h-4 fill-current" />
-          </div>
-        </div>
-
-        {/* Inner Phone Screen Content Area */}
-        <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
-          {children}
-        </div>
-
-        {/* Docked In-Phone Bottom Navigation Bar (Instagram Style) */}
-        {!hideNav && !isSplashOrAuth && (
-          <div
-            className={`h-14 px-2 flex items-center justify-around flex-shrink-0 z-30 ${
-              isCreatorRoute || isAdminRoute
-                ? 'bg-[#090a0f]/95 border-t border-white/10 text-slate-400'
-                : 'bg-black border-t border-white/10 text-white shadow-lg'
-            } backdrop-blur-xl`}
-          >
+      {/* Docked Bottom Navigation Bar (Instagram Style) */}
+      {!hideNav && !isSplashOrAuth && (
+        <div
+          className={`h-14 px-2 flex items-center justify-around flex-shrink-0 z-30 ${
+            isCreatorRoute || isAdminRoute
+              ? 'bg-[#090a0f]/95 border-t border-white/10 text-slate-400'
+              : 'bg-black border-t border-white/10 text-white shadow-lg'
+          } backdrop-blur-xl`}
+        >
             {/* 1. CREATOR NAV BAR (Screens 9, 10, 11) */}
             {isCreatorRoute ? (
               <>
@@ -330,12 +298,6 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
             )}
           </div>
         )}
-
-        {/* Smartphone Bottom Home Bar */}
-        <div className={`h-4 ${frameBg} flex items-center justify-center flex-shrink-0 transition-colors duration-200`}>
-          <div className={`w-32 h-1 ${homeBarColor} rounded-full`} />
-        </div>
-      </div>
     </div>
   );
 };

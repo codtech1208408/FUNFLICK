@@ -75,10 +75,8 @@ export const App: React.FC = () => {
     <div className="relative w-full h-full min-h-screen bg-[#07090e]">
       {/* App Opening Splash Screen */}
       {showSplash && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#07090e]">
-          <div className="relative w-full sm:max-w-[420px] h-screen sm:h-[860px] sm:max-h-[94vh] sm:rounded-[48px] sm:border-[10px] sm:border-[#1c2030] bg-[#090a0f] flex flex-col overflow-hidden shadow-2xl">
-            <SplashScreen onFinish={() => setShowSplash(false)} durationMs={2000} />
-          </div>
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#090a0f] overflow-hidden">
+          <SplashScreen onFinish={() => setShowSplash(false)} durationMs={2000} />
         </div>
       )}
 
