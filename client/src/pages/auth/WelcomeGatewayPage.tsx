@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Sparkles, Video, ArrowRight, ShieldCheck, Flame, Compass, Lock } from 'lucide-react';
+import { User, Sparkles, Video, ArrowRight, Flame, Compass, Lock } from 'lucide-react';
 import { FunFlickLogo } from '../../components/common/FunFlickLogo';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -15,10 +15,6 @@ export const WelcomeGatewayPage: React.FC = () => {
 
   const handleInfluencerLogin = () => {
     navigate('/login?role=CREATOR');
-  };
-
-  const handleAdminLogin = () => {
-    navigate('/login?role=ADMIN');
   };
 
   return (
@@ -118,19 +114,6 @@ export const WelcomeGatewayPage: React.FC = () => {
             <span>Custom Password Login</span>
           </button>
         </div>
-      </div>
-
-      {/* Bottom Admin & Safety Portal Link */}
-      <div className="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 z-10">
-        <button
-          onClick={handleAdminLogin}
-          className="flex items-center gap-1.5 text-slate-400 hover:text-emerald-400 font-semibold transition"
-        >
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Admin Portal Login</span>
-        </button>
-
-        <span>v1.0 • FunFlick</span>
       </div>
     </div>
   );
