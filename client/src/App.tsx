@@ -73,9 +73,9 @@ export const App: React.FC = () => {
 
   if (showSplash) {
     return (
-      <UserShell>
+      <MobileFrameWrapper hideNav={true}>
         <SplashScreen onFinish={() => setShowSplash(false)} durationMs={2000} />
-      </UserShell>
+      </MobileFrameWrapper>
     );
   }
 

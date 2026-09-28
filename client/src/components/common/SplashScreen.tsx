@@ -14,7 +14,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish, onGetStart
   };
 
   return (
-    <div className="h-full w-full bg-[#090a0f] flex flex-col items-center justify-between p-7 text-white select-none relative overflow-hidden animate-fade-in">
+    <div className="w-full h-full min-h-full bg-[#090a0f] flex flex-col justify-between p-6 text-white select-none relative overflow-hidden animate-fade-in">
       {/* Background ambient lighting at bottom */}
       <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-80 h-80 bg-gradient-to-t from-purple-600/30 via-rose-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
