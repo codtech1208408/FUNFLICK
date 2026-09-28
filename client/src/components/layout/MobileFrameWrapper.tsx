@@ -73,7 +73,7 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
         </div>
 
         {/* Inner Content Area */}
-        <div className={`w-full h-full flex-1 overflow-y-auto no-scrollbar relative flex flex-col ${shouldShowBottomNav ? 'pb-14' : ''}`}>
+        <div className={`w-full h-full flex-1 overflow-hidden relative flex flex-col ${shouldShowBottomNav ? 'pb-14' : ''}`}>
           {children}
         </div>
 

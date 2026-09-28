@@ -105,7 +105,7 @@ export const ExplorePage: React.FC = () => {
     : popularCreators;
 
   return (
-    <div className="w-full h-full bg-white text-slate-800 flex flex-col overflow-y-auto no-scrollbar select-none p-4 space-y-5 pb-8">
+    <div className="w-full h-full bg-white text-slate-800 flex flex-col overflow-y-auto no-scrollbar select-none p-4 space-y-5 pb-20">
       {/* Search Input Bar (Screen 4) */}
       <div className="relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
