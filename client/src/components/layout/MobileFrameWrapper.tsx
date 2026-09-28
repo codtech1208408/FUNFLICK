@@ -50,7 +50,7 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const path = location.pathname;
   const isCreatorRoute = path.startsWith('/creator');
   const isAdminRoute = path.startsWith('/admin');
-  const isAuthPage = !user || path === '/login' || path === '/register' || path === '/welcome' || path === '/welcome/';
+  const isAuthPage = path === '/login' || path === '/register' || path === '/welcome' || path === '/welcome/';
   const isLightPage = path === '/explore' || path.startsWith('/profile') || path === '/subscriptions';
 
   // Choose bg based on route
@@ -60,10 +60,10 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
   const homeBarColor = isLightPage && !isCreatorRoute && !isAdminRoute ? 'bg-slate-300' : 'bg-white/30';
 
   return (
-    <div className="w-full h-screen md:bg-[#050608] md:flex md:items-center md:justify-center md:p-4 bg-[#090a0f] overflow-hidden select-none">
+    <div className="w-full min-h-screen min-h-[100dvh] md:h-screen md:bg-[#050608] md:flex md:items-center md:justify-center md:p-4 bg-[#090a0f] overflow-x-hidden select-none">
       {/* Smartphone Frame Container on Desktop / Full Screen on Mobile */}
       <div
-        className={`w-full h-full md:w-[410px] md:h-[840px] md:max-h-[94vh] md:rounded-[44px] md:border-[10px] md:border-slate-800 md:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] md:ring-1 md:ring-white/10 ${frameBg} flex flex-col relative overflow-hidden transition-colors duration-200`}
+        className={`w-full min-h-screen min-h-[100dvh] md:w-[410px] md:h-[840px] md:max-h-[94vh] md:rounded-[44px] md:border-[10px] md:border-slate-800 md:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] md:ring-1 md:ring-white/10 ${frameBg} flex flex-col relative md:overflow-hidden transition-colors duration-200`}
       >
         {/* Dynamic Island / Speaker Notch for Mobile Frame Preview on Desktop */}
         <div className="hidden md:flex absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-4 bg-slate-900 rounded-full z-50 items-center justify-center border border-white/10 shadow-inner pointer-events-none">
@@ -72,17 +72,17 @@ export const MobileFrameWrapper: React.FC<MobileFrameWrapperProps> = ({
         </div>
 
         {/* Inner Content Area */}
-        <div className={`flex-1 overflow-y-auto no-scrollbar relative flex flex-col ${!hideNav && !isAuthPage ? 'pb-14' : ''}`}>
+        <div className={`flex-1 overflow-y-auto no-scrollbar relative flex flex-col ${!hideNav && !isAuthPage ? 'pb-16' : ''}`}>
           {children}
         </div>
 
-        {/* Fixed Bottom Navigation Bar (Instagram Style) */}
+        {/* Fixed Bottom Navigation Bar (Fixed on Mobile viewport, Absolute in Frame on Desktop) */}
         {!hideNav && !isAuthPage && (
           <div
-            className={`absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-50 ${
+            className={`fixed md:absolute bottom-0 left-0 right-0 h-14 px-2 flex items-center justify-around flex-shrink-0 z-[100] ${
               isCreatorRoute || isAdminRoute
-                ? 'bg-[#090a0f]/95 border-t border-white/10 text-slate-400'
-                : 'bg-black border-t border-white/10 text-white shadow-lg'
+                ? 'bg-[#090a0f]/98 border-t border-white/10 text-slate-400'
+                : 'bg-black border-t border-white/10 text-white shadow-2xl'
             } backdrop-blur-xl`}
           >
             {/* 1. CREATOR NAV BAR (Screens 9, 10, 11) */}
