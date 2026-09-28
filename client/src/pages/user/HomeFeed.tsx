@@ -335,7 +335,7 @@ export const HomeFeed: React.FC = () => {
               </button>
 
               {/* Bottom Creator Info & Caption */}
-              <div className="absolute bottom-16 left-3 right-16 z-20 space-y-2 pointer-events-none text-left drop-shadow-md">
+              <div className="absolute bottom-3 left-3 right-16 z-20 space-y-1.5 pointer-events-none text-left drop-shadow-md">
                 {/* Creator handle + Follow pill */}
                 <div className="flex items-center gap-2 pointer-events-auto max-w-full">
                   <Link
@@ -381,7 +381,7 @@ export const HomeFeed: React.FC = () => {
               </div>
 
               {/* Right Side Action Rail */}
-              <div className="absolute bottom-16 right-2.5 z-20 flex flex-col items-center gap-3.5 pointer-events-auto">
+              <div className="absolute bottom-3 right-2.5 z-20 flex flex-col items-center gap-3 pointer-events-auto">
                 {/* Creator Avatar with follow border */}
                 <Link
                   to={`/profile/${creator.username || 'pavani_official'}`}

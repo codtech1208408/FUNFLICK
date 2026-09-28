@@ -219,7 +219,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive }) => {
         </div>
 
         {/* Bottom Metadata & Creator Information */}
-        <div className="absolute bottom-16 left-0 right-16 px-4 py-2 z-20 bg-gradient-to-t from-black/90 via-black/60 to-transparent pointer-events-auto">
+        <div className="absolute bottom-3 left-0 right-16 px-4 py-2 z-20 bg-gradient-to-t from-black/90 via-black/60 to-transparent pointer-events-auto">
           {/* Creator Profile Chip */}
           <div className="flex items-center flex-wrap gap-2 mb-2">
             <Link to={`/profile/${reel.creator.username}`} className="flex items-center gap-2 group/creator min-w-0 max-w-[55%]">
@@ -300,7 +300,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive }) => {
         </div>
 
         {/* Right Side Action Rail */}
-        <div className="absolute right-2 bottom-16 z-20 flex flex-col items-center gap-3.5 pointer-events-auto">
+        <div className="absolute right-2 bottom-3 z-20 flex flex-col items-center gap-3.5 pointer-events-auto">
           {/* Like */}
           <button
             onClick={handleLikeToggle}
