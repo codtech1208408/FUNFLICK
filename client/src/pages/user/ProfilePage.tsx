@@ -288,7 +288,7 @@ export const ProfilePage: React.FC = () => {
         </div>
       ) : (
         /* ================= SCREEN 6: USER PROFILE ================= */
-        <div className="flex flex-col space-y-4 p-4 pb-6">
+        <div className="flex flex-col space-y-4 p-4 pb-24">
           {/* Top Bar (Screen 6) */}
           <div className="flex items-center justify-between">
             <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-slate-700 hover:text-slate-900">
@@ -297,13 +297,25 @@ export const ProfilePage: React.FC = () => {
             <div className="flex items-center gap-1">
               <span className="font-extrabold text-sm text-slate-900">@{displayHandle}</span>
             </div>
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="p-1 -mr-1 text-slate-700 hover:text-slate-900"
-              title="Edit Profile"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="p-1 text-slate-700 hover:text-slate-900"
+                title="Edit Profile"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  navigate('/welcome');
+                }}
+                className="p-1.5 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 transition"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* User Info Dynamic with Full Uncropped Rectangle Profile Image */}
@@ -426,19 +438,24 @@ export const ProfilePage: React.FC = () => {
               <ChevronRight className="w-4 h-4 text-slate-400" />
             </div>
 
-            {/* Log Out Button */}
+            {/* Prominent Log Out Button Card */}
             <button
               onClick={() => {
                 logout();
                 navigate('/welcome');
               }}
-              className="w-full flex items-center justify-between py-3 text-xs font-bold text-rose-600 hover:text-rose-700 transition group text-left pt-3"
+              className="w-full flex items-center justify-between p-3 mt-4 rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200/80 text-xs font-bold text-rose-600 transition shadow-2xs group text-left"
             >
               <div className="flex items-center gap-3">
-                <LogOut className="w-4 h-4 text-rose-500 group-hover:scale-110 transition-transform" />
-                <span>Log Out</span>
+                <div className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-xs">
+                  <LogOut className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-extrabold text-rose-600">Log Out</span>
+                  <span className="text-[10px] text-rose-400 font-medium">Sign out of your account</span>
+                </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-rose-300" />
+              <ChevronRight className="w-4 h-4 text-rose-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>
